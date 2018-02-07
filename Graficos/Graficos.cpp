@@ -18,17 +18,32 @@ GLfloat red, green, blue;
 GLfloat ty = 0.0f;
 GLfloat tx = 0.0f;
 
+double tiempoAnterior = 0.0f;
+double velocidad = 0.1f;
+double angulo = 0.2f;
+
 void actualizar()
 {
 	//Aqui esta bien para actualizar los valores
 	//De la version del programa!
+	double tiempoActual = glfwGetTime();
+	double tiempoTrancurrido = tiempoActual - tiempoAnterior;
 
 	int estadoArriba = glfwGetKey(window, GLFW_KEY_UP);
 	if (estadoArriba == GLFW_PRESS)
 	{
 		if (ty < 1)
-			ty += 0.05f;
+			ty += velocidad * tiempoTrancurrido;
 	}
+
+	int estadoAbajo = glfwGetKey(window, GLFW_KEY_DOWN);
+	if (estadoAbajo == GLFW_PRESS)
+	{
+		if (ty > -1)
+			ty -= velocidad * tiempoTrancurrido;
+	}
+
+	tiempoAnterior = tiempoActual;
 
 }
 
@@ -135,6 +150,8 @@ int main()
 	red = green = blue = 0.0f;
 
 	//glfwSetKeyCallback(window, key_callback);
+
+	tiempoAnterior = glfwGetTime();
 
 	//Ciclo de Dibujo
 	while (!glfwWindowShouldClose(window))
