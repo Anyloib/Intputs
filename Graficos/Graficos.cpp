@@ -19,8 +19,24 @@ GLfloat ty = 0.0f;
 GLfloat tx = 0.0f;
 
 double tiempoAnterior = 0.0f;
-double velocidad = 0.1f;
-double angulo = 0.2f;
+double velocidad = 0.3f;
+
+GLfloat angulo = 0.0f;
+GLfloat velocidadAngular = 180.0f;
+
+GLfloat enemigoX = 0.0f;
+GLfloat enemigoY = 0.6f;
+
+void checarColisiones()
+{
+	if (tx >= enemigoX - 0.08 &&
+		tx <= enemigoX + 0.08 &&
+		ty >= enemigoY - 0.08 &&
+		ty <= enemigoY + 0.08)
+	{
+		exit(0);
+	}
+}
 
 void actualizar()
 {
@@ -32,28 +48,52 @@ void actualizar()
 	int estadoArriba = glfwGetKey(window, GLFW_KEY_UP);
 	if (estadoArriba == GLFW_PRESS)
 	{
-		if (ty < 1)
-			ty += velocidad * tiempoTrancurrido;
+		/*if (ty < 1)
+			ty += velocidad * tiempoTrancurrido;*/
+		tx += cos((angulo + 90) * (3.14159f / 180.0f)) * velocidad * tiempoTrancurrido;
+		ty += sin((angulo + 90) * (3.14159f / 180.0f)) * velocidad * tiempoTrancurrido;
 	}
 
-	int estadoAbajo = glfwGetKey(window, GLFW_KEY_DOWN);
+	/*int estadoAbajo = glfwGetKey(window, GLFW_KEY_DOWN);
 	if (estadoAbajo == GLFW_PRESS)
 	{
 		if (ty > -1)
 			ty -= velocidad * tiempoTrancurrido;
+	}*/
+
+	int estadoIzquierda = glfwGetKey(window, GLFW_KEY_LEFT);
+	if (estadoIzquierda == GLFW_PRESS)
+	{
+		angulo += velocidadAngular * tiempoTrancurrido;
+		if (angulo > 360)
+		{
+			angulo -= 360.0f;
+		}
 	}
+
+	int estadoDerecha = glfwGetKey(window, GLFW_KEY_RIGHT);
+	if (estadoDerecha == GLFW_PRESS)
+	{
+		angulo -= velocidadAngular * tiempoTrancurrido;
+		if (angulo < 0)
+		{
+			angulo += 360.0f;
+		}
+	}
+
+	checarColisiones();
 
 	tiempoAnterior = tiempoActual;
 
 }
 
-void dibujar()
+void dibujarHeroe()
 {
 	glPushMatrix();
-
 	glTranslatef(tx, ty, 0.0f);
-	glScalef(0.08f, 0.08f, 0.08f);
+	glRotatef(angulo, 0.0f, 0.0f, 1.0f);
 
+	glScalef(0.08f, 0.08f, 0.08f);
 	glBegin(GL_TRIANGLES); //Inicia la rutina con un modo de dibujo
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex3f(-1.0f, 0.0f, 0.0f);
@@ -65,6 +105,31 @@ void dibujar()
 	glVertex3f(1.0f, 0.0f, 0.0f);
 	glEnd(); // Finaliza la rutina
 	glPopMatrix();
+}
+
+void dibujarEnemigo()
+{
+	glPushMatrix();
+	glTranslatef(enemigoX, enemigoY, 0.0f);
+
+	glScalef(0.08f, 0.08f, 0.08f);
+	glBegin(GL_TRIANGLES); //Inicia la rutina con un modo de dibujo
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(-1.0f, 0.0f, 0.0f);
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+	glEnd(); // Finaliza la rutina
+	glPopMatrix();
+}
+
+void dibujar()
+{
+	dibujarHeroe();
+	dibujarEnemigo();
 }
 
 void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods)
